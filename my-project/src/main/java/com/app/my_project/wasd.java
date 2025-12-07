@@ -1,25 +1,17 @@
 package com.app.my_project;
 
-/*
- * Copyright 2020-2021 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+// --- NEW IMPORTS NEEDED FOR COOKIE LOGIC ---
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.util.StringUtils;
+// -------------------------------------------
 
 import com.app.my_project.entity.UserEntity;
 import com.app.my_project.repository.UserRepository;
@@ -48,12 +40,10 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthen
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-/**
- * Security configuration for the main application.
- *
- * @author Josh Cummings
- */
 @Configuration
 public class wasd {
 
@@ -69,50 +59,81 @@ public class wasd {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // @formatter:off
-		http
-				.authorizeHttpRequests((authorize) -> authorize
-						.anyRequest().authenticated()
-				)
-				.csrf((csrf) -> csrf.ignoringRequestMatchers("/token"))
-				.httpBasic(Customizer.withDefaults())
-				.oauth2ResourceServer((jwt) -> jwt.jwt(Customizer.withDefaults()))
-				.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.exceptionHandling((exceptions) -> exceptions
-						.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
-						.accessDeniedHandler(new BearerTokenAccessDeniedHandler())
-				);
-		// @formatter:on
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .authorizeHttpRequests((authorize) -> authorize
+            .anyRequest().authenticated()
+            )
+            .logout(logout -> logout.disable()) 
+            .csrf((csrf) -> csrf.ignoringRequestMatchers("/token"))
+            .httpBasic(Customizer.withDefaults())
+            .oauth2ResourceServer((jwt) -> jwt
+                // --- 1. TELL SPRING TO USE THE COOKIE RESOLVER ---
+                .bearerTokenResolver(bearerTokenResolver())
+                .jwt(Customizer.withDefaults())
+            )
+            .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling((exceptions) -> exceptions
+                .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+                .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
+            );
+        // @formatter:on
         return http.build();
     }
 
-    //
+    // --- 2. DEFINE THE LOGIC TO EXTRACT TOKEN FROM COOKIE ---
+    @Bean
+    BearerTokenResolver bearerTokenResolver() {
+        return new BearerTokenResolver() {
+            @Override
+            public String resolve(HttpServletRequest request) {
+                // A. Check for "Authorization: Bearer ..." header first (optional, useful for
+                // testing)
+                String bearerToken = request.getHeader("Authorization");
+                if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+                    return bearerToken.substring(7);
+                }
+
+                // B. If no header, check cookies for "accessToken"
+                if (request.getCookies() != null) {
+                    for (Cookie cookie : request.getCookies()) {
+                        if ("accessToken".equals(cookie.getName())) {
+                            return cookie.getValue();
+                        }
+                    }
+                }
+
+                // C. No token found
+                return null;
+            }
+        };
+    }
+    // --------------------------------------------------------
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Or https if you upgraded frontend
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Added OPTIONS
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
     UserDetailsService users() {
         List<UserEntity> userForCreateToken = userRepository.findAll();
         List<UserDetails> users = new ArrayList<>();
         for (UserEntity u : userForCreateToken) {
-            UserDetails x = User.withUsername(u.getUsername()).password("{noop}" + u.getPassword())
+            UserDetails x = User.withUsername(u.getUsername()).password("{noop}" +
+                    u.getPassword())
                     .authorities(u.getRole()).build();
             users.add(x);
         }
         return new InMemoryUserDetailsManager(users);
-
-        // System.out.println("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-        // System.out.println(User.withUsername("user")
-        // .password("{noop}password")
-        // .authorities("app")
-        // .build());
-        // System.out.println("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-
-        // @formatter:off
-		// return new InMemoryUserDetailsManager(
-		// 	User.withUsername("user")
-		// 		.password("{noop}password")
-		// 		.authorities("app")
-		// 		.build()
-		// );
-		// @formatter:on
     }
 
     @Bean
@@ -126,5 +147,4 @@ public class wasd {
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
-
 }

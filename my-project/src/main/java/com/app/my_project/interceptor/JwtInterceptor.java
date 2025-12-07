@@ -35,7 +35,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         String token = request.getHeader("Authorization");
 
-        if (token == null || !token.startsWith("Bearer ")) {
+        if (token.contains(null) || !token.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }

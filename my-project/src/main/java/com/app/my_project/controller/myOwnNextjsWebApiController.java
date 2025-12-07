@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.app.my_project.annotation.RequireAuth;
+// import com.app.my_project.annotation.RequireAuth;
 import com.app.my_project.entity.myOwnNextjsWebEntity;
 import com.app.my_project.repository.myOwnNextjsWebRepository;
 
@@ -31,11 +31,11 @@ public class myOwnNextjsWebApiController {
     @Autowired
     private myOwnNextjsWebRepository myownNextjsWebRepository;
 
-    // @GetMapping
-    // // @RequireAuth
-    // public List<myOwnNextjsWebEntity> read() {
-    // return myownNextjsWebRepository.findAllByOrderByIdAsc();
-    // }
+    @GetMapping
+    // @RequireAuth
+    public List<myOwnNextjsWebEntity> read() {
+        return myownNextjsWebRepository.findAllByOrderByIdAsc();
+    }
 
     public record PageSettings(
             String searchBy,
@@ -81,32 +81,32 @@ public class myOwnNextjsWebApiController {
         }
     }
 
-    @GetMapping
-    public Page<myOwnNextjsWebEntity> read(@RequestBody PageSettings req) {
+    // @GetMapping
+    // public Page<myOwnNextjsWebEntity> read(@RequestBody PageSettings req) {
 
-        // Slice<myOwnNextjsWebEntity> r =
-        // myownNextjsWebRepository.findAll(PageRequest.of(0, 10));
+    // // Slice<myOwnNextjsWebEntity> r =
+    // // myownNextjsWebRepository.findAll(PageRequest.of(0, 10));
 
-        Pageable pageable = PageRequest.of(req.page, req.size, req.direction,
-                req.sortBy);
-        return switch (req.searchBy) {
-            case "name" -> myownNextjsWebRepository.findByNameContaining(req.keyword,
-                    pageable);
-            case "region" -> myownNextjsWebRepository.findByRegionContaining(req.keyword,
-                    pageable);
-            case "element" ->
-                myownNextjsWebRepository.findByElementContaining(req.keyword, pageable);
-            case "gender" -> myownNextjsWebRepository.findByGenderContaining(req.keyword,
-                    pageable);
-            case "rarity" ->
-                myownNextjsWebRepository.findByRarityEquals(Integer.valueOf(req.keyword),
-                        pageable);
+    // Pageable pageable = PageRequest.of(req.page, req.size, req.direction,
+    // req.sortBy);
+    // return switch (req.searchBy) {
+    // case "name" -> myownNextjsWebRepository.findByNameContaining(req.keyword,
+    // pageable);
+    // case "region" -> myownNextjsWebRepository.findByRegionContaining(req.keyword,
+    // pageable);
+    // case "element" ->
+    // myownNextjsWebRepository.findByElementContaining(req.keyword, pageable);
+    // case "gender" -> myownNextjsWebRepository.findByGenderContaining(req.keyword,
+    // pageable);
+    // case "rarity" ->
+    // myownNextjsWebRepository.findByRarityEquals(Integer.valueOf(req.keyword),
+    // pageable);
 
-            // Always have a default in case an unknown string comes in
-            default -> myownNextjsWebRepository.findAll(pageable);
-        };
+    // // Always have a default in case an unknown string comes in
+    // default -> myownNextjsWebRepository.findAll(pageable);
+    // };
 
-    }
+    // }
 
     @PostMapping
     public ResponseEntity<myOwnNextjsWebEntity> create(
