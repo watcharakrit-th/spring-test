@@ -68,8 +68,6 @@ public class MyProjectApplication {
 			if (!duplicates.isEmpty()) {
 				throw new RuntimeException("Duplicate categories found: " + duplicates);
 			}
-			System.out.println(seen);
-			System.out.println(duplicates);
 		} catch (Exception e) {
 			return e.getMessage();
 		}
@@ -115,6 +113,11 @@ public class MyProjectApplication {
 									* ((Number) amountList.get(1)).doubleValue() / 100;
 							break;
 						case "Discount by points":
+							System.out.println(totalPrice);
+							if (totalPrice * 0.2 < ((Number) ce.getAmount()).doubleValue()) {
+								totalPriceAfterDiscount -= totalPrice * 0.2;
+								break;
+							}
 							totalPriceAfterDiscount -= ((Number) ce.getAmount()).doubleValue();
 							break;
 					}
@@ -133,8 +136,8 @@ public class MyProjectApplication {
 					}
 					break;
 				default:
-					System.out.println();
-					break;
+					return totalPrice;
+
 			}
 		}
 		BigDecimal totalPriceAfterDiscount_BigDecimal = new BigDecimal(Double.toString(totalPriceAfterDiscount));
@@ -148,97 +151,105 @@ public class MyProjectApplication {
 	// @PostMapping("/hello")
 	// public Object hello(@RequestBody JsonNode rootNode) {
 
-	// 	JsonNode campaign = rootNode.get(0);
-	// 	JsonNode cart = rootNode.get(1);
-	// 	// if (campaign.get("couponName") == null
-	// 	// || ALLOWED_CAMPAIGNS.contains(campaign.get("couponName").asText()) == false)
-	// 	// {
-	// 	// return "couponName is missing or invalid";
-	// 	// }
-	// 	// if (campaign.get("onTopName") == null
-	// 	// || ALLOWED_CAMPAIGNS.contains(campaign.get("onTopName").asText()) == false) {
-	// 	// return "onTopName is missing or invalid";
-	// 	// }
-	// 	// if (campaign.get("onTopCategory") == null
-	// 	// || ALLOWED_CATEGORIES.contains(campaign.get("onTopCategory").asText()) ==
-	// 	// false) {
-	// 	// return "onTopCategory is missing or invalid";
-	// 	// }
-	// 	// if (campaign.get("seasonalName") == null
-	// 	// || ALLOWED_CAMPAIGNS.contains(campaign.get("seasonalName").asText()) ==
-	// 	// false) {
-	// 	// return "seasonalName is missing or invalid";
-	// 	// }
+	// JsonNode campaign = rootNode.get(0);
+	// JsonNode cart = rootNode.get(1);
+	// // if (campaign.get("couponName") == null
+	// // || ALLOWED_CAMPAIGNS.contains(campaign.get("couponName").asText()) ==
+	// false)
+	// // {
+	// // return "couponName is missing or invalid";
+	// // }
+	// // if (campaign.get("onTopName") == null
+	// // || ALLOWED_CAMPAIGNS.contains(campaign.get("onTopName").asText()) ==
+	// false) {
+	// // return "onTopName is missing or invalid";
+	// // }
+	// // if (campaign.get("onTopCategory") == null
+	// // || ALLOWED_CATEGORIES.contains(campaign.get("onTopCategory").asText()) ==
+	// // false) {
+	// // return "onTopCategory is missing or invalid";
+	// // }
+	// // if (campaign.get("seasonalName") == null
+	// // || ALLOWED_CAMPAIGNS.contains(campaign.get("seasonalName").asText()) ==
+	// // false) {
+	// // return "seasonalName is missing or invalid";
+	// // }
 
-	// 	DiscountEntity discountEntity = objectMapper.convertValue(campaign, DiscountEntity.class);
-	// 	List<ProductEntity> productEntities = objectMapper.convertValue(cart,
-	// 			objectMapper.getTypeFactory().constructCollectionType(List.class, ProductEntity.class));
+	// DiscountEntity discountEntity = objectMapper.convertValue(campaign,
+	// DiscountEntity.class);
+	// List<ProductEntity> productEntities = objectMapper.convertValue(cart,
+	// objectMapper.getTypeFactory().constructCollectionType(List.class,
+	// ProductEntity.class));
 
-	// 	Double totalPrice = 0.0;
-	// 	for (ProductEntity product : productEntities) {
-	// 		totalPrice += product.getProductPrice();
-	// 	}
-	// 	Double maxPrice = totalPrice;
+	// Double totalPrice = 0.0;
+	// for (ProductEntity product : productEntities) {
+	// totalPrice += product.getProductPrice();
+	// }
+	// Double maxPrice = totalPrice;
 
-	// 	if (ALLOWED_CAMPAIGNS.contains(discountEntity.getCouponName())) {
-	// 		totalPrice -= calculateCoupon(discountEntity.getCouponName(),
-	// 				discountEntity.getCouponAmount(), totalPrice);
-	// 		System.out.println(totalPrice);
-	// 	}
-	// 	if (ALLOWED_CAMPAIGNS.contains(discountEntity.getOnTopName())) {
-	// 		totalPrice -= calculateOnTop(discountEntity.getOnTopName(),
-	// 				discountEntity.getOnTopAmount(),
-	// 				discountEntity.getOnTopCategory(), productEntities, totalPrice);
-	// 		System.out.println(totalPrice);
-	// 	}
-	// 	if (ALLOWED_CAMPAIGNS.contains(discountEntity.getSeasonalName())) {
-	// 		totalPrice -= calculateSeasonal(discountEntity.getSeasonalCap(),
-	// 				discountEntity.getSeasonalAmount(), maxPrice);
-	// 		System.out.println(totalPrice);
-	// 	}
-	// 	System.out.println("-----------------------------------------");
+	// if (ALLOWED_CAMPAIGNS.contains(discountEntity.getCouponName())) {
+	// totalPrice -= calculateCoupon(discountEntity.getCouponName(),
+	// discountEntity.getCouponAmount(), totalPrice);
+	// System.out.println(totalPrice);
+	// }
+	// if (ALLOWED_CAMPAIGNS.contains(discountEntity.getOnTopName())) {
+	// totalPrice -= calculateOnTop(discountEntity.getOnTopName(),
+	// discountEntity.getOnTopAmount(),
+	// discountEntity.getOnTopCategory(), productEntities, totalPrice);
+	// System.out.println(totalPrice);
+	// }
+	// if (ALLOWED_CAMPAIGNS.contains(discountEntity.getSeasonalName())) {
+	// totalPrice -= calculateSeasonal(discountEntity.getSeasonalCap(),
+	// discountEntity.getSeasonalAmount(), maxPrice);
+	// System.out.println(totalPrice);
+	// }
+	// System.out.println("-----------------------------------------");
 
-	// 	BigDecimal bd = new BigDecimal(Double.toString(totalPrice));
-	// 	return bd.setScale(2, RoundingMode.HALF_UP);
+	// BigDecimal bd = new BigDecimal(Double.toString(totalPrice));
+	// return bd.setScale(2, RoundingMode.HALF_UP);
 	// }
 
-	// public Double calculateCoupon(String couponName, Double couponAmount, Double totalPrice) {
-	// 	switch (couponName) {
-	// 		case "Fixed amount":
-	// 			return couponAmount;
-	// 		case "Percentage discount":
-	// 			return totalPrice * couponAmount / 100;
-	// 		default:
-	// 			return 0.0;
-	// 	}
+	// public Double calculateCoupon(String couponName, Double couponAmount, Double
+	// totalPrice) {
+	// switch (couponName) {
+	// case "Fixed amount":
+	// return couponAmount;
+	// case "Percentage discount":
+	// return totalPrice * couponAmount / 100;
+	// default:
+	// return 0.0;
+	// }
 	// }
 
-	// public Double calculateOnTop(String onTopName, Double onTopAmount, String onTopCategory,
-	// 		List<ProductEntity> productEntities,
-	// 		Double totalPrice) {
-	// 	Double percentageDiscount = 0.0;
+	// public Double calculateOnTop(String onTopName, Double onTopAmount, String
+	// onTopCategory,
+	// List<ProductEntity> productEntities,
+	// Double totalPrice) {
+	// Double percentageDiscount = 0.0;
 
-	// 	switch (onTopName) {
-	// 		case "Percentage discount by item category":
-	// 			for (ProductEntity product : productEntities) {
-	// 				if (product.getProductCategory().equals(onTopCategory)) {
+	// switch (onTopName) {
+	// case "Percentage discount by item category":
+	// for (ProductEntity product : productEntities) {
+	// if (product.getProductCategory().equals(onTopCategory)) {
 
-	// 					percentageDiscount += product.getProductPrice();
-	// 				}
-	// 			}
-	// 			percentageDiscount = percentageDiscount * onTopAmount / 100;
+	// percentageDiscount += product.getProductPrice();
+	// }
+	// }
+	// percentageDiscount = percentageDiscount * onTopAmount / 100;
 
-	// 			return percentageDiscount;
-	// 		case "Discount by points":
-	// 			return onTopAmount;
-	// 		default:
-	// 			return 0.0;
-	// 	}
+	// return percentageDiscount;
+	// case "Discount by points":
+	// return onTopAmount;
+	// default:
+	// return 0.0;
+	// }
 
 	// }
 
-	// public Double calculateSeasonal(Long seasonalCap, Double seasonalAmount, Double maxPrice) {
-	// 	return (double) ((maxPrice.longValue() / seasonalCap) * seasonalAmount.longValue());
+	// public Double calculateSeasonal(Long seasonalCap, Double seasonalAmount,
+	// Double maxPrice) {
+	// return (double) ((maxPrice.longValue() / seasonalCap) *
+	// seasonalAmount.longValue());
 	// }
 
 }
