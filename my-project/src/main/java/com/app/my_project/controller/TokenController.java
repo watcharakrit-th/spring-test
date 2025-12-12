@@ -46,7 +46,7 @@ public class TokenController {
     @PostMapping("/token")
     public ResponseEntity<String> token(Authentication authentication) {
         Instant now = Instant.now();
-        long expiry = 600L;
+        long expiry = 7200L;
         // @formatter:off
 		String scope = authentication.getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)

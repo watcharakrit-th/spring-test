@@ -28,7 +28,7 @@
 // @RestController
 // public class HelloController {
 
-// @GetMapping("/")
+// @GetMapping("/hello")
 // public String hello(Authentication authentication) {
 // return "Hello, " + authentication.getName() + "!" + "\n >.< " +
 // authentication.isAuthenticated() + "\n >.< "
