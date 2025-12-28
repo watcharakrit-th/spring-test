@@ -6,7 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 
 @Entity
-public class myOwnNextjsWebEntity {
+public class myWebEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

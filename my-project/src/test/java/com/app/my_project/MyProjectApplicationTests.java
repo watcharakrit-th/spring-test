@@ -37,7 +37,7 @@ class MyProjectApplicationTests {
 	@Test
 	void testGetCharacters() throws Exception {
 		// Perform a GET request to /characters
-		mockMvc.perform(get("/myOwnNextjsWeb")
+		mockMvc.perform(get("/myWeb")
 
 				.param("page", "0")
 				.param("size", "10")

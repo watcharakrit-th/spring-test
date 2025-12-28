@@ -22,20 +22,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 // import com.app.my_project.annotation.RequireAuth;
-import com.app.my_project.entity.myOwnNextjsWebEntity;
-import com.app.my_project.repository.myOwnNextjsWebRepository;
+import com.app.my_project.entity.myWebEntity;
+import com.app.my_project.repository.myWebRepository;
 
 @RestController
-@RequestMapping("/myOwnNextjsWeb")
-public class myOwnNextjsWebApiController {
+@RequestMapping("/myWeb")
+public class myWebApiController {
     @Autowired
-    private myOwnNextjsWebRepository myownNextjsWebRepository;
+    private myWebRepository mywebRepository;
 
-    @GetMapping
-    // @RequireAuth
-    public List<myOwnNextjsWebEntity> read() {
-        return myownNextjsWebRepository.findAllByOrderByIdAsc();
-    }
+    // @GetMapping
+    // // @RequireAuth
+    // public List<myWebEntity> read() {
+    //     return myWebRepository.findAllByOrderByIdAsc();
+    // }
 
     public record PageSettings(
             String searchBy,
@@ -81,49 +81,49 @@ public class myOwnNextjsWebApiController {
         }
     }
 
-    // @GetMapping
-    // public Page<myOwnNextjsWebEntity> read(@RequestBody PageSettings req) {
+    @GetMapping
+    public Page<myWebEntity> read(@RequestBody PageSettings req) {
 
-    // // Slice<myOwnNextjsWebEntity> r =
-    // // myownNextjsWebRepository.findAll(PageRequest.of(0, 10));
+        // Slice<myWebEntity> r =
+        // mywebRepository.findAll(PageRequest.of(0, 10));
 
-    // Pageable pageable = PageRequest.of(req.page, req.size, req.direction,
-    // req.sortBy);
-    // return switch (req.searchBy) {
-    // case "name" -> myownNextjsWebRepository.findByNameContaining(req.keyword,
-    // pageable);
-    // case "region" -> myownNextjsWebRepository.findByRegionContaining(req.keyword,
-    // pageable);
-    // case "element" ->
-    // myownNextjsWebRepository.findByElementContaining(req.keyword, pageable);
-    // case "gender" -> myownNextjsWebRepository.findByGenderContaining(req.keyword,
-    // pageable);
-    // case "rarity" ->
-    // myownNextjsWebRepository.findByRarityEquals(Integer.valueOf(req.keyword),
-    // pageable);
+        Pageable pageable = PageRequest.of(req.page, req.size, req.direction,
+                req.sortBy);
+        return switch (req.searchBy) {
+            case "name" -> mywebRepository.findByNameContaining(req.keyword,
+                    pageable);
+            case "region" -> mywebRepository.findByRegionContaining(req.keyword,
+                    pageable);
+            case "element" ->
+                mywebRepository.findByElementContaining(req.keyword, pageable);
+            case "gender" -> mywebRepository.findByGenderContaining(req.keyword,
+                    pageable);
+            case "rarity" ->
+                mywebRepository.findByRarityEquals(Integer.valueOf(req.keyword),
+                        pageable);
 
-    // // Always have a default in case an unknown string comes in
-    // default -> myownNextjsWebRepository.findAll(pageable);
-    // };
+            // Always have a default in case an unknown string comes in
+            default -> mywebRepository.findAll(pageable);
+        };
 
-    // }
+    }
 
     @PostMapping
-    public ResponseEntity<myOwnNextjsWebEntity> create(
-            @RequestBody myOwnNextjsWebEntity myownNextjsWebEntity) {
-        return ResponseEntity.ok(myownNextjsWebRepository.save(myownNextjsWebEntity));
+    public ResponseEntity<myWebEntity> create(
+            @RequestBody myWebEntity myWebEntity) {
+        return ResponseEntity.ok(mywebRepository.save(myWebEntity));
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody List<myOwnNextjsWebEntity> req) {
-        for (myOwnNextjsWebEntity obj : req) {
-            myOwnNextjsWebEntity item = myownNextjsWebRepository.findById(obj.getId()).orElse(null);
+    public ResponseEntity update(@RequestBody List<myWebEntity> req) {
+        for (myWebEntity obj : req) {
+            myWebEntity item = mywebRepository.findById(obj.getId()).orElse(null);
             item.setName(obj.getName());
             item.setRegion(obj.getRegion());
             item.setElement(obj.getElement());
             item.setGender(obj.getGender());
             item.setRarity(obj.getRarity());
-            myownNextjsWebRepository.save(item);
+            mywebRepository.save(item);
         }
 
         if (req == null) {
@@ -135,7 +135,7 @@ public class myOwnNextjsWebApiController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        myownNextjsWebRepository.deleteById(id);
+        mywebRepository.deleteById(id);
     }
 
 }

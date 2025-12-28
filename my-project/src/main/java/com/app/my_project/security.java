@@ -45,7 +45,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-public class wasd {
+public class security {
 
     @Autowired
     private UserRepository userRepository;
